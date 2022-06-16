@@ -24,8 +24,9 @@ let outlookLinks =
     | project Timestamp, DeviceId, DeviceName, WasOutlookSafeLink, InitiatingProcessFileName,
             OpenedLink=iff(WasOutlookSafeLink, url_decode(tostring(ParsedUrl["Query Parameters"]["url"])), RemoteUrl);
 let alerts =
-    DeviceAlertEvents
+    AlertInfo
     | summarize (FirstDetectedActivity, Title)=argmin(Timestamp, Title) by AlertId, DeviceId
+    | join AlertEvidence on AlertId
     // Filter alerts that include events from before the queried time period
     | where FirstDetectedActivity > minTimeRange;
 // Join the two together - looking for alerts that are right after an abnormal network logon
